@@ -36,14 +36,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::request()
 {
-    //    qDebug() << "************************************";
     m_readData.append(sport->readAll());
-
 }
 
 unsigned char encoder(unsigned char val)
 {
-    const unsigned char focus[255] = {199, 197, 193, 192, 128, 160, 161, 225, 97, 101, 109, 111, 239, 207, 206, 142, 143, 139, 131, 129, 1, 65, 85, 195, 194, 202, 218, 222, 223, 159, 157, 29, 31, 23, 7, 3, 2, 130, 134, 135, 133, 149, 181, 189, 191, 63, 59, 58, 62, 46, 14, 6, 4, 5, 13, 15, 11, 43, 107, 123, 127, 126, 118, 116, 124, 92, 28, 12, 8, 10, 26, 30, 22, 86, 214, 246, 254, 252, 236, 232, 248, 184, 56, 24, 16, 20, 52, 60, 44, 172, 173, 237, 253, 249, 217, 209, 241, 113, 112, 48, 32, 40, 104, 120, 88, 89, 91, 219, 251, 243, 179, 163, 227, 226, 224, 96, 64, 80, 208, 240, 176, 178, 182, 183, 247, 231, 103, 71};
+    const unsigned char focus[255] = {199, 197, 193, 192, 128, 160, 161, 225, 97, 101, 109, 111, 239, 207, 206, 142, 143, 139, 131, 129, 1, 65, 67, 85, 195, 194, 202, 218, 222, 223, 159, 157, 29, 31, 23, 7, 3, 2, 130, 134, 135, 133, 149, 181, 189, 191, 63, 59, 58, 62, 46, 14, 6, 4, 5, 13, 15, 11, 43, 107, 123, 127, 126, 118, 116, 124, 92, 28, 12, 8, 10, 26, 30, 22, 86, 214, 246, 254, 252, 236, 232, 248, 184, 56, 24, 16, 20, 52, 60, 44, 172, 173, 237, 253, 249, 217, 209, 241, 113, 112, 48, 32, 40, 104, 120, 88, 89, 91, 219, 251, 243, 179, 163, 227, 226, 224, 96, 64, 80, 208, 240, 176, 178, 182, 183, 247, 231, 103, 71};
     unsigned char i;
     for(i=0; i<=127; ++i)
     {
@@ -63,12 +61,8 @@ void MainWindow::readData()
         i = m_readData.indexOf(0x55,2);
         if(m_readData.size()-i < 11)
         {
-
             m_readData.truncate(i);
             qDebug() << "truncate";
-
-
-
         }
         else
         {
@@ -77,28 +71,12 @@ void MainWindow::readData()
             rData.truncate(11);
             m_readData.lastIndexOf(rData);
             qDebug() <<  i << " " << rData.toHex();
-            //if()
-
-//            uc = m_readData[1]; ui->lcdNumber_1->display(uc);
-//            ui->lineEdit->setText(QString::number(uc));
-//            if (ruc != uc)
-//            {
-//                ui->textBrowser->append(QString::number(uc));
-//                ui->textBrowser->append(" ");
-//                ruc = uc;
-//            }
-
             m_readData.remove(0,i);
             qDebug() << "remove";
         }
         sport->setRequestToSend(false); // выставить RTS
     }
     sport->setRequestToSend(true); // выставить RTS
-
-    //    qDebug() << "-----------------------------------";
-    qDebug() <<  i << " " << m_readData.toHex();
-    //    qDebug() << "-----------------------------------";
-
     uc = m_readData[1]; ui->lcdNumber_1->display(uc);
     uc = m_readData[2]; ui->lcdNumber_2->display(uc);
     uc = m_readData[3]; ui->lcdNumber_3->display(uc);
@@ -134,8 +112,6 @@ void MainWindow::on_pushButton_clicked()
     ui->pushButton_2->setEnabled(true);
     sport->setFlowControl(QSerialPort::NoFlowControl);
     sport->setSettingsRestoredOnClose(false);
-    //sport->setReadBufferSize(11);
-    //sport->read(cdata,5);
     sport->setRequestToSend(true); // выставить RTS
     connect(sport, &QSerialPort::readyRead, this, &MainWindow::request);
     stimer->start(5);
@@ -151,21 +127,4 @@ void MainWindow::on_pushButton_2_clicked()
     qDebug() << "-----------------------------------";
     qDebug() << "COMPORT закрыт";
     qDebug() << "-----------------------------------";
-}
-
-void MainWindow::on_checkRequest_toggled(bool checked)
-{
-    //    if(checked)
-    //    {
-    //        stimer->start();
-    //    }
-    //    else
-    //    {
-    //        stimer->stop();
-    //    }
-}
-
-void MainWindow::on_lineEdit_textChanged(const QString &arg1)
-{
-    //stimer->start(arg1.toInt());
 }

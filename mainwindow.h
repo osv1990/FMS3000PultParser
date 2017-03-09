@@ -21,10 +21,6 @@ private slots:
 
     void on_pushButton_2_clicked();
 
-    void on_checkRequest_toggled(bool checked);
-
-    void on_lineEdit_textChanged(const QString &arg1);
-
     void request();
 
     void readData();
