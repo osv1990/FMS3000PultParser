@@ -8,7 +8,7 @@
 
 QSerialPort *sport;
 QTimer *stimer;
-const unsigned char focus[255] = {127, 63, 62, 58, 56, 184, 152, 24, 8, 72, 73, 77, 79, 15, 47, 175, 191, 159, 31, 29, 28, 92, 76, 12, 4, 36, 164, 166, 167, 135, 151, 215, 223, 207, 143, 142, 14, 46, 38, 6, 2, 18, 82, 83, 211, 195, 203, 235, 239, 231, 199, 71, 7, 23, 19, 3, 1, 9, 41, 169, 233, 225, 229, 245, 247, 243, 227, 163, 131, 139, 137, 129, 128, 132, 148, 212, 244, 240, 242, 250, 251, 249, 241, 209, 193, 197, 196, 192, 64, 66, 74, 106, 122, 120, 121, 125, 253, 252, 248, 232, 224, 226, 98, 96, 32, 33, 37, 53, 61, 60, 188, 190, 254, 126, 124, 116, 112, 113, 49, 48, 16, 144, 146, 154, 158, 30, 94, 95};
+unsigned char ruc=0;
 QByteArray  m_readData,rData;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_2->setEnabled(false);
     foreach (const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts())
     {
+        if(serialPortInfo.portName() != "COM30")
         ui->comboBox->addItem(serialPortInfo.portName());
     }
 
@@ -40,20 +41,34 @@ void MainWindow::request()
 
 }
 
-
+unsigned char encoder(unsigned char val)
+{
+    const unsigned char focus[255] = {199, 197, 193, 192, 128, 160, 161, 225, 97, 101, 109, 111, 239, 207, 206, 142, 143, 139, 131, 129, 1, 65, 85, 195, 194, 202, 218, 222, 223, 159, 157, 29, 31, 23, 7, 3, 2, 130, 134, 135, 133, 149, 181, 189, 191, 63, 59, 58, 62, 46, 14, 6, 4, 5, 13, 15, 11, 43, 107, 123, 127, 126, 118, 116, 124, 92, 28, 12, 8, 10, 26, 30, 22, 86, 214, 246, 254, 252, 236, 232, 248, 184, 56, 24, 16, 20, 52, 60, 44, 172, 173, 237, 253, 249, 217, 209, 241, 113, 112, 48, 32, 40, 104, 120, 88, 89, 91, 219, 251, 243, 179, 163, 227, 226, 224, 96, 64, 80, 208, 240, 176, 178, 182, 183, 247, 231, 103, 71};
+    unsigned char i;
+    for(i=0; i<=127; ++i)
+    {
+        if(focus[i] == val ) break;
+    }
+        return i;
+}
 
 void MainWindow::readData()
 {
 
     int i=0;
+    unsigned char uc;
 
     while (i != -1)
     {
         i = m_readData.indexOf(0x55,2);
         if(m_readData.size()-i < 11)
         {
+
             m_readData.truncate(i);
             qDebug() << "truncate";
+
+
+
         }
         else
         {
@@ -63,6 +78,16 @@ void MainWindow::readData()
             m_readData.lastIndexOf(rData);
             qDebug() <<  i << " " << rData.toHex();
             //if()
+
+//            uc = m_readData[1]; ui->lcdNumber_1->display(uc);
+//            ui->lineEdit->setText(QString::number(uc));
+//            if (ruc != uc)
+//            {
+//                ui->textBrowser->append(QString::number(uc));
+//                ui->textBrowser->append(" ");
+//                ruc = uc;
+//            }
+
             m_readData.remove(0,i);
             qDebug() << "remove";
         }
@@ -73,11 +98,13 @@ void MainWindow::readData()
     //    qDebug() << "-----------------------------------";
     qDebug() <<  i << " " << m_readData.toHex();
     //    qDebug() << "-----------------------------------";
-    ui->lcdNumber_1->display(m_readData.data()[0]);
-    ui->lcdNumber_2->display(m_readData.data()[1]);
-    ui->lcdNumber_3->display(m_readData.data()[2]);
-    ui->lcdNumber_4->display(focus[m_readData.data()[1]]);
-    ui->lcdNumber_5->display(focus[m_readData.data()[2]]);
+
+    uc = m_readData[1]; ui->lcdNumber_1->display(uc);
+    uc = m_readData[2]; ui->lcdNumber_2->display(uc);
+    uc = m_readData[3]; ui->lcdNumber_3->display(uc);
+                        ui->lcdNumber_4->display(127 - encoder(m_readData[1]));
+                        ui->lcdNumber_5->display(127 - encoder(m_readData[2]));
+
 }
 
 void MainWindow::on_pushButton_clicked()
